@@ -1,24 +1,23 @@
 import pika
 
-def publish_messages():
+def publish_message(message, recipient):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 
-    channel.queue_declare(queue='fila_teste')
+    channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
 
-    while True:
-        mensagem = input("Digite a mensagem que deseja enviar (ou 'sair' para sair): ")
-        
-        if mensagem.lower() == 'sair':
-            break  # Sai do loop se 'sair' for digitado
-        
-        channel.basic_publish(exchange='',
-                              routing_key='fila_teste',
-                              body=mensagem)
-        
-        print(f" [x] Mensagem enviada: {mensagem}")
+    routing_key = f"mensagens.{recipient}" if recipient.lower() != 'all' else 'todos'
+
+    channel.basic_publish(exchange='topic_logs',
+                          routing_key=routing_key,
+                          body=message)
+
+    print(f" [x] Mensagem enviada para {recipient if recipient.lower() != 'all' else 'todos'}: {message}")
 
     connection.close()
 
 if __name__ == '__main__':
-    publish_messages()
+    recipient = input("Digite o nome do subscriber para o qual deseja enviar a mensagem (ou 'all' para todos): ")
+    message = input("Digite a mensagem que deseja enviar: ")
+    
+    publish_message(message, recipient)

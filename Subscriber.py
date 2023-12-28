@@ -1,17 +1,26 @@
 import pika
 
 def callback(ch, method, properties, body):
-    mensagem_decodificada = body.decode('utf-8')
-    print(f" [x] Recebido: {mensagem_decodificada}")
+    print(f" [x] Recebido: {body.decode('utf-8')}")
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
-channel.queue_declare(queue='fila_teste')
+channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
 
-channel.basic_consume(queue='fila_teste',
-                      on_message_callback=callback,
-                      auto_ack=True)
+result = channel.queue_declare('', exclusive=True)
+queue_name = result.method.queue
 
-print(' [*] Aguardando mensagens. Para sair, pressione CTRL+C')
+binding_key = input("Digite o seu nome de usuário para receber mensagens (ou 'all' para todas): ")
+
+if binding_key.lower() == 'all':
+    binding_key = '#'
+else:
+    binding_key = f"mensagens.{binding_key}"
+
+channel.queue_bind(exchange='topic_logs', queue=queue_name, routing_key=binding_key)
+
+channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+
+print(f' [*] Aguardando mensagens para {binding_key if binding_key != "#" else "todos"}. Para sair, pressione CTRL+C')
 channel.start_consuming()
