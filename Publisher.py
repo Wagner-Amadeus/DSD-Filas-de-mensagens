@@ -17,7 +17,12 @@ def publish_message(message, recipient):
     connection.close()
 
 if __name__ == '__main__':
-    recipient = input("Digite o nome do subscriber para o qual deseja enviar a mensagem (ou 'all' para todos): ")
-    message = input("Digite a mensagem que deseja enviar: ")
-    
-    publish_message(message, recipient)
+    while True:
+        recipient = input("Digite o nome do subscriber para o qual deseja enviar a mensagem (ou 'all' para todos, 'exit' para sair): ")
+
+        if recipient.lower() == 'exit':
+            break
+
+        message = input("Messagem: ")
+
+        publish_message(message, recipient)
