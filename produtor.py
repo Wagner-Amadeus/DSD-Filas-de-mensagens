@@ -26,7 +26,7 @@ def enviar():
         dados_gerais = f"{temperatura} /t {pressao}"
         channel.basic_publish(exchange='', routing_key='fila_geral', body=dados_gerais)
 
-    return 'Dados enviados com sucesso!'
+    return 'OK'
 
 if __name__ == '__main__':
     app.run(debug=True)
