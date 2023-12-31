@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtor de Dados</title>
+
+    <style>
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Envie Dados</h1>
+    
+    <form id="enviarForm" action="/enviar" method="post">
+        <label for="temperatura">Temperature:</label>
+        <input type="text" name="temperatura">
+        
+        <label for="pressao">Pressure:</label>
+        <input type="text" name="pressao">
+        
+        <button type="submit">Enviar</button>
+        <button type="button" onclick="simularDados()">Simular Dados</button>
+    </form>
+
+    <div id="popup">
+        <p id="popupMessage"></p>
+        <button onclick="fecharPopup()">OK</button>
+    </div>
+
+<!-- ... (código anterior) ... -->
+<!-- ... (código anterior) ... -->
+
+<script>
+    function exibirPopup(mensagem) {
+        document.getElementById('popupMessage').innerText = mensagem;
+        document.getElementById('popup').style.display = 'block';
+        setTimeout(function() {
+            fecharPopup();
+        }, 3000); // Fecha o popup após 3 segundos
+    }
+
+    function fecharPopup() {
+        document.getElementById('popup').style.display = 'none';
+        document.getElementById('enviarForm').reset(); // Limpa os campos do formulário
+    }
+
+    function simularDados() {
+        var temperaturaSimulada = Math.round(Math.random() * (60 - 17) + 17);
+        var pressaoSimulada = Math.round(Math.random() * (200 - 100) + 100);
+
+        fetch('/enviar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'temperatura=' + temperaturaSimulada + '&pressao=' + pressaoSimulada
+        })
+        .then(response => response.text())
+        .then(data => {
+            exibirPopup('Dados simulados enviados com sucesso!');
+        })
+        .catch(error => {
+            console.error('Erro ao enviar dados simulados:', error);
+        });
+    }
+</script>
+</body>
+</html>
