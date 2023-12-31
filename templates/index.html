@@ -22,7 +22,7 @@
     </style>
 </head>
 <body>
-    <h1>Envie Dados</h1>
+    <h1>Estação Espacial Internacional</h1>
     
     <form id="enviarForm" action="/enviar" method="post">
         <label for="temperatura">Temperature:</label>
@@ -31,7 +31,7 @@
         <label for="pressao">Pressure:</label>
         <input type="text" name="pressao">
         
-        <button type="submit">Enviar</button>
+        <button type="submit" id="btnEnviar">Enviar</button>
     </form>
 
     <div id="popup">
@@ -39,38 +39,52 @@
         <button onclick="fecharPopup()">OK</button>
     </div>
 
-    
-<script>
-    function exibirPopup(mensagem) {
-        document.getElementById('popupMessage').innerText = mensagem;
-        document.getElementById('popup').style.display = 'block';
-        setTimeout(function() {
-            fecharPopup();
-        }, 3000); // Fecha o popup após 3 segundos
-    }
+    <script>
+        function exibirPopup(mensagem) {
+            document.getElementById('popupMessage').innerText = mensagem;
+            document.getElementById('popup').style.display = 'block';
+            setTimeout(function() {
+                fecharPopup();
+            }, 1000); // Fecha o popup após 1 segundo
+        }
 
-    function fecharPopup() {
-        document.getElementById('popup').style.display = 'none';
-        document.getElementById('enviarForm').reset(); // Limpa os campos do formulário
-    }
+        function fecharPopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('enviarForm').reset(); // Limpa os campos do formulário
+        }
 
-    document.getElementById('enviarForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+        function gerarValoresAleatorios() {
+            var temperatura = Math.floor(Math.random() * (50 - 18 + 1)) + 18;
+            var pressao = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+            
+            document.getElementsByName('temperatura')[0].value = temperatura;
+            document.getElementsByName('pressao')[0].value = pressao;
 
-        var formData = new FormData(event.target);
+            // Simular o envio ao clicar no botão "Enviar"
+            document.getElementById('btnEnviar').click();
+        }
 
-        fetch('/enviar', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            exibirPopup('Dados enviados com sucesso!');
-        })
-        .catch(error => {
-            console.error('Erro ao enviar dados:', error);
+        setInterval(function() {
+            gerarValoresAleatorios();
+        }, 2000); // Gera novos valores e envia a cada 2 segundos
+
+        document.getElementById('enviarForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(event.target);
+
+            fetch('/enviar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                exibirPopup('Dados enviados com sucesso!');
+            })
+            .catch(error => {
+                console.error('Erro ao enviar dados:', error);
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
